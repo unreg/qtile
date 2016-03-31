@@ -106,24 +106,33 @@ class Floating(Layout):
             elif win.fullscreen:
                 win.fullscreen = True
             else:
-                # By default, place window at same offset from top corner
-                new_x = new_screen.x + win.float_x
-                new_y = new_screen.y + win.float_y
+                # catch if the client hasn't been configured
+                try:
+                    # By default, place window at same offset from top corner
+                    new_x = new_screen.x + win.float_x
+                    new_y = new_screen.y + win.float_y
+                except AttributeError:
+                    # this will be handled in .configure()
+                    pass
+                else:
+                    # make sure window isn't off screen left/right...
+                    new_x = min(new_x, new_screen.x + new_screen.width - win.width)
+                    new_x = max(new_x, new_screen.x)
+                    # and up/down
+                    new_y = min(new_y, new_screen.y + new_screen.height - win.height)
+                    new_y = max(new_y, new_screen.y)
 
-                # make sure window isn't off screen left/right...
-                new_x = min(new_x, new_screen.x + new_screen.width - win.width)
-                new_x = max(new_x, new_screen.x)
-                # and up/down
-                new_y = min(new_y, new_screen.y + new_screen.height - win.height)
-                new_y = max(new_y, new_screen.y)
-
-                win.x = new_x
-                win.y = new_y
+                    win.x = new_x
+                    win.y = new_y
             win.group = new_screen.group
 
-    def focus_first(self, group):
-        clients = self.find_clients(group)
-        if group and clients:
+    def focus_first(self, group=None):
+        if group is None:
+            clients = self.clients
+        else:
+            clients = self.find_clients(group)
+
+        if clients:
             return clients[0]
 
     def focus_next(self, win):
@@ -135,9 +144,13 @@ class Floating(Layout):
         if len(clients) > idx + 1:
             return clients[idx + 1]
 
-    def focus_last(self, group):
-        clients = self.find_clients(group)
-        if group and clients:
+    def focus_last(self, group=None):
+        if group is None:
+            clients = self.clients
+        else:
+            clients = self.find_clients(group)
+
+        if clients:
             return clients[-1]
 
     def focus_previous(self, win):
@@ -167,11 +180,23 @@ class Floating(Layout):
         else:
             bw = self.border_width
 
-        # We definitely have a screen here, so if we haven't configured on a
-        # screen before, let's trigger the logic in _float_getter to stay on
-        # that window
-        client.float_x  # no-qa
-        client.float_y  # no-qa
+        # We definitely have a screen here, so let's be sure we'll float on screen
+        try:
+            client.float_x
+            client.float_y
+        except AttributeError:
+            # this window hasn't been placed before, let's put it in a sensible spot
+            x = screen.x + client.x % screen.width
+            # try to get right edge on screen (without moving the left edge off)
+            x = min(x, screen.x - client.width)
+            x = max(x, screen.x)
+            # then update it's position (`.place()` will take care of `.float_x`)
+            client.x = x
+
+            y = screen.y + client.y % screen.height
+            y = min(y, screen.y - client.height)
+            y = max(y, screen.y)
+            client.y = y
 
         client.place(
             client.x,

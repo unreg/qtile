@@ -25,7 +25,7 @@ import six
 import libqtile.utils as utils
 
 
-class Foo:
+class Foo(object):
     ran = False
 
     @utils.LRUCache(2)
@@ -35,8 +35,8 @@ class Foo:
 
 
 def test_translate_masks():
-    assert utils.translateMasks(["shift", "control"])
-    assert utils.translateMasks([]) == 0
+    assert utils.translate_masks(["shift", "control"])
+    assert utils.translate_masks([]) == 0
 
 
 def test_lrucache_works_as_decorator():

@@ -59,7 +59,7 @@ class Key(object):
             raise utils.QtileError("Unknown key: %s" % key)
         self.keysym = xcbq.keysyms[key]
         try:
-            self.modmask = utils.translateMasks(self.modifiers)
+            self.modmask = utils.translate_masks(self.modifiers)
         except KeyError as v:
             raise utils.QtileError(v)
 
@@ -77,14 +77,14 @@ class Drag(object):
     `focus=None` as an argument
     """
     def __init__(self, modifiers, button, *commands, **kwargs):
-        self.start = kwargs.get("start", None)
+        self.start = kwargs.get("start")
         self.focus = kwargs.get("focus", "before")
         self.modifiers = modifiers
         self.button = button
         self.commands = commands
         try:
             self.button_code = int(self.button.replace('Button', ''))
-            self.modmask = utils.translateMasks(self.modifiers)
+            self.modmask = utils.translate_masks(self.modifiers)
         except KeyError as v:
             raise utils.QtileError(v)
 
@@ -105,7 +105,7 @@ class Click(object):
         self.commands = commands
         try:
             self.button_code = int(self.button.replace('Button', ''))
-            self.modmask = utils.translateMasks(self.modifiers)
+            self.modmask = utils.translate_masks(self.modifiers)
         except KeyError as v:
             raise utils.QtileError(v)
 

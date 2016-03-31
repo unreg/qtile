@@ -144,30 +144,7 @@ def _float_getter(attr):
         if attr in ('width', 'height'):
             return getattr(self, attr)
 
-        if self.group and self.group.screen:
-            # we haven't set this float_info, and we have a group with a screen
-            # default self.float_x/y to self.x/y, but be sure to properly constrain us to the screen
-            x = getattr(self, attr)
-            if attr == 'x':
-                max_x = self.group.screen.width
-                dx = self.float_width
-            elif attr == 'y':
-                max_x = self.group.screen.height
-                dx = self.float_height
-            else:
-                raise AttributeError("Unknown float parameter: %s" % attr)
-
-            # constrain it to be on the page
-            x = min(x, max_x - dx)
-            x = max(x, 0)
-
-            # we need to reset our position as well
-            setattr(self, attr, x + getattr(self.group.screen, attr))
-
-            return x
-        else:
-            # we haven't set this float_info, and we don't have a screen, lets just return a value, we'll fix this later
-            return getattr(self, attr)
+        raise AttributeError("Floating not yet configured yet")
     return getter
 
 
@@ -815,9 +792,7 @@ class Window(_Window):
                 )
             else:
                 # if we are setting floating early, e.g. from a hook, we don't have a screen yet
-                self._enablefloating(
-                    self.float_x, self.float_y, self.float_width, self.float_height
-                )
+                self._float_state = FLOATING
         elif (not do_float) and self._float_state != NOT_FLOATING:
             if self._float_state == FLOATING:
                 # store last size
@@ -1177,6 +1152,23 @@ class Window(_Window):
                     current_state ^= set([prop])  # toggle :D
 
             self.window.set_property('_NET_WM_STATE', list(current_state))
+        elif atoms["_NET_ACTIVE_WINDOW"] == opcode:
+            source = data.data32[0]
+            if source == 2:  # XCB_EWMH_CLIENT_SOURCE_TYPE_NORMAL
+                logger.info("Focusing window by pager")
+                self.qtile.currentScreen.setGroup(self.group)
+                self.group.focus(self)
+            else:  # XCB_EWMH_CLIENT_SOURCE_TYPE_OTHER
+                focus_behavior = self.qtile.config.focus_on_window_activation
+                if focus_behavior == "focus" or (focus_behavior == "smart" and self.group.screen):
+                    logger.info("Focusing window")
+                    self.qtile.currentScreen.setGroup(self.group)
+                    self.group.focus(self)
+                elif focus_behavior == "urgent" or (focus_behavior == "smart" and not self.group.screen):
+                    logger.info("Setting urgent flag for window")
+                    self.urgent = True
+                else:
+                    logger.info("Ignoring focus request")
 
     def handle_PropertyNotify(self, e):
         name = self.qtile.conn.atoms.get_name(e.atom)

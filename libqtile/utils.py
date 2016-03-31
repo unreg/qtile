@@ -41,7 +41,7 @@ def lget(o, v):
         return None
 
 
-def translateMasks(modifiers):
+def translate_masks(modifiers):
     """
     Translate a modifier mask specified as a list of strings into an or-ed
     bit representation.
@@ -56,9 +56,9 @@ def translateMasks(modifiers):
         return reduce(operator.or_, masks)
     else:
         return 0
-		
-		
-def translateModifiers(mask):
+
+
+def translate_modifiers(mask):
     r = []
     for k, v in xcbq.ModMasks.items():
         if mask & v:
@@ -129,7 +129,7 @@ def rgb(x):
             (255, 0, 0)
             (255, 0, 0, 0.5)
     """
-    if isinstance(x, tuple) or isinstance(x, list):
+    if isinstance(x, (tuple, list)):
         if len(x) == 4:
             alpha = x[3]
         else:

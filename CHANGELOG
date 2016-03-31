@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 qtile x.x.x, released xxxx-xx-xx:
     * file path changes (XDG Base Directory specification)
         - the default log file path changed from ~/.qtile.log to

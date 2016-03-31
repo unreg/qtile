@@ -1,11 +1,4 @@
-# Copyright (c) 2011 Florian Mounier
-# Copyright (c) 2012, 2014-2015 Tycho Andersen
-# Copyright (c) 2013 Mattias Svala
-# Copyright (c) 2013 Craig Barnes
-# Copyright (c) 2014 ramnes
-# Copyright (c) 2014 Sean Vig
-# Copyright (c) 2014 Adi Sieker
-# Copyright (c) 2014 Chris Wesseling
+# Copyright (c) 2008, Aldo Cortesi. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,43 +22,47 @@ from libqtile import layout
 import libqtile.manager
 import libqtile.config
 from ..utils import Xephyr
-from .layout_utils import assertDimensions, assertFocused, assertFocusPath
+from .layout_utils import assertFocused
 
 
-class VerticalTileConfig(object):
+class FloatingConfig(object):
     auto_fullscreen = True
     main = None
     groups = [
         libqtile.config.Group("a"),
-        libqtile.config.Group("b"),
-        libqtile.config.Group("c"),
-        libqtile.config.Group("d")
     ]
     layouts = [
-        layout.VerticalTile(columns=2)
+        layout.Floating()
     ]
     floating_layout = libqtile.layout.floating.Floating()
     keys = []
     mouse = []
     screens = []
+    follow_mouse_focus = False
 
 
-@Xephyr(False, VerticalTileConfig())
-def test_verticaltile_simple(self):
+@Xephyr(False, FloatingConfig())
+def test_float_next_prev_window(self):
+    # spawn three windows
     self.testWindow("one")
-    assertDimensions(self, 0, 0, 800, 600)
     self.testWindow("two")
-    assertDimensions(self, 0, 300, 798, 298)
     self.testWindow("three")
-    assertDimensions(self, 0, 400, 798, 198)
 
+    # focus previous windows
+    assertFocused(self, "three")
+    self.c.group.prev_window()
+    assertFocused(self, "two")
+    self.c.group.prev_window()
+    assertFocused(self, "one")
+    # checking that it loops around properly
+    self.c.group.prev_window()
+    assertFocused(self, "three")
 
-@Xephyr(False, VerticalTileConfig())
-def test_verticaltile_maximize(self):
-    self.testWindow("one")
-    assertDimensions(self, 0, 0, 800, 600)
-    self.testWindow("two")
-    assertDimensions(self, 0, 300, 798, 298)
-    # Maximize the bottom layout, taking 75% of space
-    self.c.layout.maximize()
-    assertDimensions(self, 0, 150, 798, 448)
+    # focus next windows
+    # checking that it loops around properly
+    self.c.group.next_window()
+    assertFocused(self, "one")
+    self.c.group.next_window()
+    assertFocused(self, "two")
+    self.c.group.next_window()
+    assertFocused(self, "three")
