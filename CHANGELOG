@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 qtile x.x.x, released xxxx-xx-xx:
     * file path changes (XDG Base Directory specification)
         - the default log file path changed from ~/.qtile.log to
@@ -6,8 +7,18 @@ qtile x.x.x, released xxxx-xx-xx:
         - the prompt widget's history file changed from ~/.qtile_history to
           ~/.cache/qtile/prompt_history
     * features
+        - new Columns layout, composed of dynamic and configurable columns of
+          windows
+        - new iPython kernel for qsh, called iqsh, see docs for installing
+        - new qsh command `display_kb` to show current key binding
+        - add json interface to IPC server
+        - add commands for resizing MonadTall main panel
         - wlan widget shows when you are disconnected and uses a configurable
           format
+    * bugfixes
+        - fix path handling in PromptWidget
+        - fix KeyboardLayout widget cycling keyboard
+        - properly guard against setting screen to too large screen index
 
 qtile 0.10.4, released 2016-01-19:
     !!! Config breakage !!!
