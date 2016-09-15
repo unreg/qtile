@@ -8,7 +8,7 @@ if [[ -z PYTHON ]]; then
     PYTHON=python
 fi
 
-Xephyr +extension RANDR -screen ${SCREEN_SIZE} ${XDISPLAY} -ac -dpi 125 &
+Xephyr +extension RANDR -screen ${SCREEN_SIZE} ${XDISPLAY} -ac -dpi 96 &
 XEPHYR_PID=$!
 (
   sleep 1
