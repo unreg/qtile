@@ -278,7 +278,7 @@ class _TextBox(_Widget):
     """
         Base class for widgets that are just boxes containing text.
     """
-    orientations = ORIENTATION_HORIZONTAL
+    orientations = ORIENTATION_BOTH
     defaults = [
         ("font", "Arial", "Default font"),
         ("fontsize", None, "Font size. Calculated if None."),
@@ -290,6 +290,8 @@ class _TextBox(_Widget):
             "font shadow color, default is None(no shadow)"
         ),
         ("markup", False, "Whether or not to use pango markup"),
+        ("text_framed", False, "Framed text layout"),
+        ("framed", False, "Framed all box"),
     ]
 
     def __init__(self, text=" ", width=bar.CALCULATED, **config):
@@ -361,23 +363,53 @@ class _TextBox(_Widget):
 
     def calculate_length(self):
         if self.text:
-            return min(
-                self.layout.width,
-                self.bar.width
-            ) + self.actual_padding * 2
+            if self.bar.horizontal:
+                return min(
+                    self.layout.width,
+                    self.bar.width
+                ) + self.actual_padding * 2
+            else:
+                return min(
+                    self.layout.height,
+                    self.bar.height
+                ) + self.actual_padding * 2
         else:
             return 0
 
     def draw(self):
         # if the bar hasn't placed us yet
-        if self.offsetx is None:
-            return
+        if self.bar.horizontal:
+            if self.offsetx is None:
+                return
+        else:
+            if self.offsety is None:
+                return
+
         self.drawer.clear(self.background or self.bar.background)
-        self.layout.draw(
-            self.actual_padding or 0,
-            int(self.bar.height / 2.0 - self.layout.height / 2.0) + 1
-        )
-        self.drawer.draw(offsetx=self.offsetx, width=self.width)
+
+        if self.bar.horizontal:
+            pad_x = self.actual_padding
+            if self.padding is None:
+                pad_y = self.actual_padding
+            else:
+                pad_y = int(self.bar.height / 2.0 - self.layout.height / 2.0) + 1
+        else:
+            if self.padding is None:
+                pad_x = int(self.bar.width / 2.0 - self.layout.width / 2.0) + 1
+            else:
+                pad_x = self.actual_padding
+            pad_y = self.actual_padding
+
+        if self.text_framed:
+            frame = self.layout.framed(1, '#ffffff', 0, 0)
+            frame.draw(pad_x or 0, pad_y or 0)
+        else:
+            self.layout.draw(pad_x or 0, pad_y or 0)
+
+        if self.bar.horizontal:
+            self.drawer.draw(offsetx=self.offsetx, width=self.width)
+        else:
+            self.drawer.draw(offsety=self.offsety, height=self.height)
 
     def cmd_set_font(self, font=UNSPECIFIED, fontsize=UNSPECIFIED,
                      fontshadow=UNSPECIFIED):

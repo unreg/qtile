@@ -74,7 +74,9 @@ def CairoContext(cairo_t):
 
     return cairo_t
 
+ALIGN_LEFT = pango.PANGO_ALIGN_LEFT
 ALIGN_CENTER = pango.PANGO_ALIGN_CENTER
+ALIGN_RIGHT = pango.PANGO_ALIGN_RIGHT
 ELLIPSIZE_END = pango.PANGO_ELLIPSIZE_END
 units_from_double = pango.pango_units_from_double
 

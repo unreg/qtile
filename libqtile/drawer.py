@@ -45,7 +45,7 @@ class TextLayout(object):
                  font_shadow, wrap=True, markup=False):
         self.drawer, self.colour = drawer, colour
         layout = drawer.ctx.create_layout()
-        layout.set_alignment(pangocffi.ALIGN_CENTER)
+        layout.set_alignment(pangocffi.ALIGN_LEFT)
         if not wrap:  # pango wraps by default
             layout.set_ellipsize(pangocffi.ELLIPSIZE_END)
         desc = pangocffi.FontDescription.from_string(font_family)
