@@ -390,9 +390,10 @@ class _TextBox(_Widget):
         if self.bar.horizontal:
             pad_x = self.actual_padding
             if self.padding is None:
-                pad_y = self.actual_padding
-            else:
                 pad_y = int(self.bar.height / 2.0 - self.layout.height / 2.0) + 1
+            else:
+                pad_y = self.actual_padding
+
         else:
             if self.padding is None:
                 pad_x = int(self.bar.width / 2.0 - self.layout.width / 2.0) + 1
